@@ -5,7 +5,7 @@
       <el-col :span="12">
         <div class="left">
           <Hitokoto />
-          <Music v-if="playerHasId" />
+          <Music />
         </div>
       </el-col>
       <el-col :span="12">
@@ -18,7 +18,11 @@
               <span class="sm-hidden">{{ currentTime.weekday }}</span>
             </div>
             <div class="text">
-              <span> {{ currentTime.hour }}:{{ currentTime.minute }}:{{ currentTime.second }}</span>
+              <span>
+                {{ currentTime.hour }}:{{ currentTime.minute }}:{{
+                  currentTime.second
+                }}</span
+              >
             </div>
           </div>
           <Weather />
@@ -29,33 +33,27 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { getCurrentTime } from "@/utils/getTime";
 import { mainStore } from "@/store";
-import Music from "@/components/Music.vue";
-import Hitokoto from "@/components/Hitokoto.vue";
-import Weather from "@/components/Weather.vue";
+import Music from "@/components/Music/index.vue";
+import Hitokoto from "@/components/Hitokoto/index.vue";
+import Weather from "@/components/Weather/index.vue";
 
 const store = mainStore();
 
 // 当前时间
-const currentTime = ref({});
-const timeInterval = ref(null);
-
-// 播放器 id
-const playerHasId = import.meta.env.VITE_SONG_ID;
-
-// 更新时间
-const updateTimeData = () => {
-  currentTime.value = getCurrentTime();
-};
+let currentTime = ref({});
+let timeInterval = null;
 
 onMounted(() => {
-  updateTimeData();
-  timeInterval.value = setInterval(updateTimeData, 1000);
+  timeInterval = setInterval(() => {
+    currentTime.value = getCurrentTime();
+  }, 1000);
 });
 
 onBeforeUnmount(() => {
-  clearInterval(timeInterval.value);
+  clearInterval(timeInterval);
 });
 </script>
 
@@ -112,7 +110,8 @@ onBeforeUnmount(() => {
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      animation: fade 0.5s;
+      animation: fade;
+      -webkit-animation: fade 0.5s;
       .time {
         font-size: 1.1rem;
         text-align: center;
@@ -126,15 +125,6 @@ onBeforeUnmount(() => {
           font-size: 3.25rem;
           letter-spacing: 2px;
           font-family: "UnidreamLED";
-        }
-        @media (min-width: 1201px) and (max-width: 1280px) {
-          font-size: 1rem;
-        }
-        @media (min-width: 911px) and (max-width: 992px) {
-          font-size: 1rem;
-          .text {
-            font-size: 2.75rem;
-          }
         }
       }
       .weather {

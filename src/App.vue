@@ -1,18 +1,18 @@
 <template>
-  <!-- 加载 -->
-  <Loading />
-  <!-- 壁纸 -->
-  <Background @loadComplete="loadComplete" />
-  <!-- 主界面 -->
-  <Transition name="fade" mode="out-in">
-    <main id="main" v-if="store.imgLoadStatus">
+  <div class="animate">
+    <Background />
+    <main>
       <div class="container" v-show="!store.backgroundShow">
-        <section class="all" v-show="!store.setOpenState">
+        <section class="main" v-show="!store.setOpenState">
           <MainLeft />
           <MainRight v-show="!store.boxOpenState" />
           <Box v-show="store.boxOpenState" />
         </section>
-        <section class="more" v-show="store.setOpenState" @click="store.setOpenState = false">
+        <section
+          class="more"
+          v-show="store.setOpenState"
+          @click="store.setOpenState = false"
+        >
           <MoreSet />
         </section>
       </div>
@@ -20,33 +20,30 @@
       <Icon
         class="menu"
         size="24"
-        v-show="!store.backgroundShow"
         @click="store.mobileOpenState = !store.mobileOpenState"
       >
         <component :is="store.mobileOpenState ? CloseSmall : HamburgerButton" />
       </Icon>
-      <!-- 页脚 -->
-      <Transition name="fade" mode="out-in">
-        <Footer class="f-ter" v-show="!store.backgroundShow && !store.setOpenState" />
-      </Transition>
     </main>
-  </Transition>
+    <Footer v-show="!store.backgroundShow && !store.setOpenState" />
+  </div>
 </template>
-
 <script setup>
+import { onMounted, onBeforeUnmount, watch } from "vue";
 import { helloInit, checkDays } from "@/utils/getTime.js";
-import { HamburgerButton, CloseSmall } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { Icon } from "@vicons/utils";
-import Loading from "@/components/Loading.vue";
+import { HamburgerButton, CloseSmall } from "@icon-park/vue-next";
 import MainLeft from "@/views/Main/Left.vue";
 import MainRight from "@/views/Main/Right.vue";
-import Background from "@/components/Background.vue";
-import Footer from "@/components/Footer.vue";
+import Background from "@/components/Background/index.vue";
+import Footer from "@/components/Footer/index.vue";
 import Box from "@/views/Box/index.vue";
 import MoreSet from "@/views/MoreSet/index.vue";
 import cursorInit from "@/utils/cursor.js";
 import config from "@/../package.json";
+// 新春灯笼
+// import "@/utils/lantern.js";
 
 const store = mainStore();
 
@@ -55,30 +52,22 @@ const getWidth = () => {
   store.setInnerWidth(window.innerWidth);
 };
 
-// 加载完成事件
-const loadComplete = () => {
-  nextTick(() => {
-    // 欢迎提示
-    helloInit();
-    // 默哀模式
-    checkDays();
-  });
-};
-
-// 监听宽度变化
-watch(
-  () => store.innerWidth,
-  (value) => {
-    if (value < 721) {
-      store.boxOpenState = false;
-      store.setOpenState = false;
-    }
-  },
-);
-
 onMounted(() => {
   // 自定义鼠标
   cursorInit();
+  // 欢迎提示
+  helloInit();
+  // 默哀模式
+  checkDays();
+  // 加载完成事件
+  window.addEventListener("load", () => {
+    console.log("加载完成");
+    // 去除加载标记
+    document.getElementsByTagName("body")[0].className = "";
+    // 给加载动画添加结束标记
+    let loadingBox = document.getElementById("loading-box");
+    loadingBox.classList.add("loaded");
+  });
 
   // 屏蔽右键
   document.oncontextmenu = () => {
@@ -94,10 +83,11 @@ onMounted(() => {
   window.addEventListener("mousedown", (event) => {
     if (event.button == 1) {
       store.backgroundShow = !store.backgroundShow;
-      ElMessage({
-        message: `已${store.backgroundShow ? "开启" : "退出"}壁纸展示状态`,
-        grouping: true,
-      });
+      if (store.backgroundShow) {
+        ElMessage("已开启壁纸展示状态");
+      } else {
+        ElMessage("已退出壁纸展示状态");
+      }
     }
   });
 
@@ -106,20 +96,35 @@ onMounted(() => {
   window.addEventListener("resize", getWidth);
 
   // 控制台输出
-  const styleTitle1 = "font-size: 20px;font-weight: 600;color: rgb(244,167,89);";
-  const styleTitle2 = "font-size:12px;color: rgb(244,167,89);";
-  const styleContent = "color: rgb(30,152,255);";
-  const title1 = "無名の主页";
-  const title2 = `
+  let styleTitle1 = "font-size: 20px;font-weight: 600;color: rgb(244,167,89);";
+  let styleTitle2 = "font-size:12px;color: rgb(244,167,89);";
+  let styleContent = "color: rgb(30,152,255);";
+  let title1 = "Vuzの主页";
+  let title2 = `
  _____ __  __  _______     ____     __
 |_   _|  \\/  |/ ____\\ \\   / /\\ \\   / /
-  | | | \\  / | (___  \\ \\_/ /  \\ \\_/ /
-  | | | |\\/| |\\___ \\  \\   /    \\   /
- _| |_| |  | |____) |  | |      | |
+  | | | \\  / | (___  \\ \\_/ /  \\ \\_/ / 
+  | | | |\\/| |\\___ \\  \\   /    \\   /  
+ _| |_| |  | |____) |  | |      | |   
 |_____|_|  |_|_____/   |_|      |_|`;
-  const content = `\n\n版本: ${config.version}\n主页: ${config.home}\nGithub: ${config.github}`;
-  console.info(`%c${title1} %c${title2} %c${content}`, styleTitle1, styleTitle2, styleContent);
+  let content = `\n\n版本: ${config.version}\n主页: ${config.home}\nGithub: ${config.github}`;
+  console.info(
+    `%c${title1} %c${title2} %c${content}`,
+    styleTitle1,
+    styleTitle2,
+    styleContent
+  );
 });
+
+// 监听宽度变化
+watch(
+  () => store.innerWidth,
+  (value) => {
+    if (value < 990) {
+      store.boxOpenState = false;
+    }
+  }
+);
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", getWidth);
@@ -127,22 +132,15 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-#main {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transform: scale(1.2);
-  transition: transform 0.3s;
-  animation: fade-blur-main-in 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  animation-delay: 0.5s;
+main {
   .container {
     width: 100%;
     height: 100vh;
     margin: 0 auto;
-    padding: 0 0.5vw;
-    .all {
+    @media (max-width: 1200px) {
+      padding: 0 2vw;
+    }
+    .main {
       width: 100%;
       height: 100%;
       padding: 0 0.75rem;
@@ -160,14 +158,12 @@ onBeforeUnmount(() => {
       background-color: #00000080;
       backdrop-filter: blur(20px);
       z-index: 2;
-      animation: fade 0.5s;
-    }
-    @media (max-width: 1200px) {
-      padding: 0 2vw;
+      animation: fade;
+      -webkit-animation: fade 0.5s;
     }
   }
   .menu {
-    position: absolute;
+    position: fixed;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -178,77 +174,37 @@ onBeforeUnmount(() => {
     background: rgb(0 0 0 / 20%);
     backdrop-filter: blur(10px);
     border-radius: 6px;
-    transition: transform 0.3s;
-    animation: fade 0.5s;
+    transition: all 0.3s;
+    animation: fade;
+    -webkit-animation: fade 0.5s;
     &:active {
       transform: scale(0.95);
     }
     .i-icon {
       transform: translateY(2px);
     }
-    @media (min-width: 721px) {
+    @media (min-width: 720px) {
       display: none;
     }
   }
-  @media (max-height: 720px) {
-    overflow-y: auto;
-    overflow-x: hidden;
-    .container {
-      height: 721px;
-      .more {
-        height: 721px;
-        width: calc(100% + 6px);
-      }
-      @media (min-width: 391px) {
-        // w 1201px ~ max
-        padding-left: 0.7vw;
-        padding-right: 0.25vw;
-        @media (max-width: 1200px) { // w 1101px ~ 1280px
-          padding-left: 2.3vw;
-          padding-right: 1.75vw;
-        }
-        @media (max-width: 1100px) { // w 993px ~ 1100px
-          padding-left: 2vw;
-          padding-right: calc(2vw - 6px);
-        }
-        @media (max-width: 992px) { // w 901px ~ 992px
-          padding-left: 2.3vw;
-          padding-right: 1.7vw;
-        }
-        @media (max-width: 900px) { // w 391px ~ 900px
-          padding-left: 2vw;
-          padding-right: calc(2vw - 6px);
-        }
-      }
-    }
-    .menu {
-      top: 605.64px; // 721px * 0.84
-      left: 170.5px; // 391 * 0.5 - 25px
-      @media (min-width: 391px) {
-        left: calc(50% - 25px);
-      }
-    }
-    .f-ter {
-      top: 675px; // 721px - 46px
-      @media (min-width: 391px) {
-        padding-left: 6px;
-      }
-    }
-  }
-  @media (max-width: 390px) {
-    overflow-x: auto;
-    .container {
-      width: 391px;
-    }
-    .menu {
-      left: 167.5px; // 391px * 0.5 - 28px
-    }
-    .f-ter {
-      width: 391px;
-    }
-    @media (min-height: 721px) {
-      overflow-y: hidden;
-    }
+}
+
+// 加载动画层
+.animate {
+  transform: scale(1);
+  transition: all ease 1.25s;
+  opacity: 1;
+  filter: blur(0);
+  width: 100%;
+  height: 100%;
+}
+
+.loading {
+  .animate {
+    transform: scale(1.2);
+    transition: all ease 1.25s;
+    opacity: 0;
+    filter: blur(10px);
   }
 }
 </style>
