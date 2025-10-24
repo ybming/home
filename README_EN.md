@@ -1,7 +1,11 @@
 English | [Chinese](./README.md)
 
+> [!IMPORTANT]
+> ## 致大家
+> This project was originally just a simple homepage. However, as more and more friends discovered this project, it received a lot of undue attention. Moreover, as a work of a beginner in front-end development, its code is quite messy and of low quality. In addition, this project has also been resold by many unknown resource or download sites, causing many unsuspecting buyers to find my contact information from the source code to consult on problems or request features. But due to current personal life reasons, and I have never gained any benefits from this project, so I am unable to maintain this project. This repository will not be archived. We will actively accept PRs from all the experts, but no updates will be made for any new features or bugs. Please understand!
+
 <p>
-<strong><h2>無名の主页</h2></strong>
+<strong><h2>Homepage</h2></strong>
 Simple little homepage, had enough of the original one and made a new one
 </p>
 
@@ -14,7 +18,8 @@ Simple little homepage, had enough of the original one and made a new one
 >Due to CDN caching, you may need `Ctrl` + `F5` to force a browser cache refresh to see the latest results
 
 - [無名の主页](https://www.imsyy.top)
-- [無名の主页 - 备用线路](https://home-imsyy.vercel.app/)
+- [無名の主页 - Dev](https://home-imsyy.vercel.app)
+- [無名の主页 - Standby](https://home-5iw.pages.dev)
 
 ### Functions
 
@@ -31,11 +36,28 @@ Simple little homepage, had enough of the original one and made a new one
 
 ### Deployment
 
+* **Installation** [node.js](https://nodejs.org/zh-cn/) **Environment**
+
+  > node > 16.16.0  
+  > npm > 8.15.0
+  
+* Then run the `cmd` terminal with **administrator privileges** and `cd` to the project root directory
+* In the `terminal` type:
+
 ```bash
-yarn install
-yarn dev
-yarn build
+# Install pnpm
+npm install -g pnpm
+
+# Install the dependencies
+pnpm install
+
+# Preview
+pnpm dev
+
+# Build
+pnpm build
 ```
+
 > Once the build is complete, the files in the `dist` folder can be uploaded to the server or imported and automatically deployed with one click using a hosting platform such as `Vercel`.
 
 ### Weather
@@ -118,8 +140,8 @@ make clean all
 
 ### API
 
-* [MetingAPI By 武恩赐](https://api.wuenci.com/meting/api/)
-* [小歪 API](https://api.ixiaowai.cn/)
+* [韩小韩 WebAPI 接口](https://api.vvhan.com/)
+* [搏天 API](https://api.btstu.cn/doc/sjbz.php)
 * [高德开放平台](https://lbs.amap.com/)
 * [Hitokoto 一言](https://hitokoto.cn/)
 
